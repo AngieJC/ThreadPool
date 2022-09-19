@@ -1,3 +1,6 @@
+// change by AngieJC @ 9/19/2022
+// change workers from private to public
+
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 
@@ -14,13 +17,13 @@
 class ThreadPool {
 public:
     ThreadPool(size_t);
+    // need to keep track of threads so we can join them
+    std::vector< std::thread > workers; // the main thread can join other threads
     template<class F, class... Args>
     auto enqueue(F&& f, Args&&... args) 
         -> std::future<typename std::result_of<F(Args...)>::type>;
     ~ThreadPool();
 private:
-    // need to keep track of threads so we can join them
-    std::vector< std::thread > workers;
     // the task queue
     std::queue< std::function<void()> > tasks;
     
@@ -91,8 +94,9 @@ inline ThreadPool::~ThreadPool()
         stop = true;
     }
     condition.notify_all();
-    for(std::thread &worker: workers)
-        worker.join();
+    // for(std::thread &worker: workers)
+    //     worker.join();
 }
 
 #endif
+
